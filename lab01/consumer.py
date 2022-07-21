@@ -27,9 +27,10 @@ def run(task):
     time.sleep(sleep_time)
 
 
-def batch_run(collection):
+def batch_run(tasks):
 
-    print('tasks length:', len(collection))
+    print('tasks length:', len(tasks))
+    print(tasks, '\n')
 
     rand_num = random.randint(0,10)
 
@@ -37,7 +38,7 @@ def batch_run(collection):
         print('failed.', '\n')
         return False
     else:
-        print(collection, '\n')
+        print(tasks, '\n')
         time.sleep(3)
         return True
 
@@ -51,15 +52,31 @@ def callback(ch, method, properties, body):
     # ch.basic_ack(delivery_tag = method.delivery_tag)
 
     # batch process
-    collection.append(msg)
-    if len(collection) % collection_batch_size == 0:
-        result = batch_run(collection)
-        if result:
-            ch.basic_ack(delivery_tag = method.delivery_tag, multiple=True)
-        else:
-            ch.basic_nack(delivery_tag = method.delivery_tag, multiple=True)
-        collection.clear()
-        
+    # collection.append(msg)
+    # if len(collection) % collection_batch_size == 0:
+    #     result = batch_run(collection)
+    #     if result:
+    #         ch.basic_ack(delivery_tag = method.delivery_tag, multiple=True)
+    #     else:
+    #         ch.basic_nack(delivery_tag = method.delivery_tag, multiple=True)
+    #     collection.clear()
+
+
+def consume2():
+
+    # channel.basic_qos(prefetch_count=1)
+
+    channel.basic_consume(queue='work-queue', on_message_callback=callback)
+
+    try:
+        print(' [*] Waiting for messages. To exit press CTRL+C')
+        channel.start_consuming()
+    except KeyboardInterrupt:
+        print('Stop consuming.')
+        channel.stop_consuming()
+
+    connection.close()
+ 
 
 def consume3():
 
@@ -98,22 +115,6 @@ def consume3():
                 else:
                     channel.basic_nack(delivery_tag = last_delivery_tag, multiple=True)
                 collection.clear()
-
-    connection.close()
-
-
-def consume2():
-
-    # channel.basic_qos(prefetch_count=1)
-
-    channel.basic_consume(queue='work-queue', on_message_callback=callback)
-
-    try:
-        print(' [*] Waiting for messages. To exit press CTRL+C')
-        channel.start_consuming()
-    except KeyboardInterrupt:
-        print('Stop consuming.')
-        channel.stop_consuming()
 
     connection.close()
 
