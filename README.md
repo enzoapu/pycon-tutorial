@@ -10,8 +10,7 @@ git clone https://github.com/enzoapu/pycon-tutorial.git
 use docker
 ```
 # create and start container
-docker run --rm --name rabbitmq -p 5672:5672 -p 15672:15672 \
--e RABBITMQ_DEFAULT_USER=root -e RABBITMQ_DEFAULT_PASS=1234 \ rabbitmq:management
+docker run --rm --name rabbitmq -p 5672:5672 -p 15672:15672 -e RABBITMQ_DEFAULT_USER=root -e RABBITMQ_DEFAULT_PASS=1234 rabbitmq:management
 
 # stop and shutdown container
 docker stop rabbitmq
